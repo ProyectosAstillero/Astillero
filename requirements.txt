@@ -1,0 +1,3 @@
+openpyxl
+streamlit_lottie
+streamlit_calendar
