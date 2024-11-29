@@ -1,4 +1,4 @@
 openpyxl
 streamlit_lottie
 streamlit_calendar
-treamlit_extras
+streamlit_extras
