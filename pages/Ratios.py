@@ -148,7 +148,7 @@ scatter_plot.add_trace(
     )
 
 # Agregar la ecuación de la regresión como anotación
-equation_text = f"Ecuación: y = {slope:.2f}x + {intercept:.2f}"
+equation_text = f"f(x)  = {slope:.2f}x + {intercept:.2f}"
 scatter_plot.add_annotation(
         x=max(x),  # Posición en el eje X
         y=max(reg_line),  # Posición en el eje Y
@@ -208,7 +208,7 @@ scatter_plot2.add_trace(
 )
 
 # Agregar la ecuación como anotación
-equation_text2 = f"Ecuación: y = {a:.2f}x² + {b:.2f}x + {c:.2f}"
+equation_text2 = f"f(x)  = {a:.2f}x² + {b:.2f}x + {c:.2f}"
 scatter_plot2.add_annotation(
     x=A.mean(),  # Posición centrada en el promedio de X
     y=(a * A.mean()**2 + b * A.mean() + c),  # Valor en el promedio de X
@@ -272,7 +272,7 @@ for y_column, x_column, title in combos:
     )
 
     # Agregar la ecuación de la regresión como anotación
-    equation_text = f"Ecuación: y = {slope:.2f}x + {intercept:.2f}"
+    equation_text = f"f(x) = {slope:.2f}x + {intercept:.2f}"
     scatter_plot.add_annotation(
         x=A.mean(),  # Posición centrada en el promedio de X
         y=(slope * A.mean() + intercept),  # Valor en el promedio de X
