@@ -20,23 +20,58 @@ st.set_page_config(
 # Ruta al archivo de Excel
 BD = './BD.xlsx'
 
+# Leer todas las hojas del archivo de Excel
+hojas = pd.read_excel(BD, sheet_name=None)  # `sheet_name=None` carga todas las hojas
+
+# Crear una lista para almacenar los DataFrames de todas las hojas
+dataframes = []
+
+# Iterar sobre cada hoja y agregarla a la lista de DataFrames
+for nombre_hoja, df in hojas.items():
+    # Agregar una nueva columna 'Hoja' para identificar de qué hoja proviene cada fila
+    df['Hoja'] = nombre_hoja
+    # Agregar el DataFrame de la hoja a la lista
+    dataframes.append(df)
+
+# Concatenar todos los DataFrames de la lista en uno solo
+df_total = pd.concat(dataframes, ignore_index=True)
+
 # Cargar el libro de trabajo y las hojas disponibles
 TEMPORADAS = load_workbook(BD, read_only=True).sheetnames
+print(df_total)
+#selector_temporada = st.sidebar.selectbox("Seleccione la temporada:", TEMPORADAS, index=0)
 
-selector_temporada = st.sidebar.selectbox("Seleccione la temporada:", TEMPORADAS, index=0)
-df_proyecto = pd.read_excel(BD, sheet_name=selector_temporada)
+selector_temporada = st.sidebar.multiselect("Seleccione la temporada:", TEMPORADAS)
+print(selector_temporada)
+#df_proyecto = pd.read_excel(BD, sheet_name=selector_temporada)
 
-df_proyecto = df_proyecto[df_proyecto['Temporada'].isin([selector_temporada])]
+df_proyecto = df_total[df_total['Temporada'].isin(selector_temporada)]
+print(df_proyecto)
 
-# Ruta al archivo de Excel
-UTI = './'+selector_temporada+'/UTI.xlsx'
-df_UTI = pd.read_excel(UTI, sheet_name="Sheet1")
+# Inicializamos las listas para almacenar los DataFrames de cada temporada
+df_UTI_list = []
+df_REDI_list = []
 
-# Reemplazar valores N/A (NaN) con ceros
-df_UTI = df_UTI.fillna(0)
+# Iterar sobre cada temporada
+for temporada in selector_temporada:
+    # Construir la ruta al archivo UTI y REDI
+    UTI = './' + temporada + '/UTI.xlsx'
+    REDI = './' + temporada + '/REDI.xlsx'
+    
+    # Cargar los archivos correspondientes a la temporada
+    df_UTI = pd.read_excel(UTI, sheet_name="Sheet1")
+    df_REDI = pd.read_excel(REDI, sheet_name="Sheet1")
+    
+    # Reemplazar valores N/A (NaN) con ceros en el DataFrame de UTI
+    df_UTI = df_UTI.fillna(0)
+    
+    # Almacenar los DataFrames en las listas
+    df_UTI_list.append(df_UTI)
+    df_REDI_list.append(df_REDI)
 
-REDI = './'+selector_temporada+'/REDI.xlsx'
-df_REDI = pd.read_excel(REDI, sheet_name="Sheet1")
+# Si necesitas combinar los DataFrames de todas las temporadas en uno solo, puedes usar pd.concat:
+df_UTI = pd.concat(df_UTI_list, ignore_index=True)
+df_REDI = pd.concat(df_REDI_list, ignore_index=True)
 
 ############################PESOS#########################################
 df_acero= df_REDI.groupby(['Proyecto','Categoría'])['Peso estimado(kg)'].sum().reset_index()
