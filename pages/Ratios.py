@@ -286,8 +286,8 @@ for y_column, x_column, title in combos:
 
     # Configurar el diseño del gráfico
     scatter_plot.update_layout(
-        xaxis_title=f'{x_column} (Toneladas)',
-        yaxis_title=f'{y_column} (kg o pzas)',
+        xaxis_title=f'{x_column}',
+        yaxis_title=f'{y_column}',
         width=800,
         height=600,
     )
