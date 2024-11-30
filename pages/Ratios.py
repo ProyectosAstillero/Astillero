@@ -41,7 +41,7 @@ TEMPORADAS = load_workbook(BD, read_only=True).sheetnames
 print(df_total)
 #selector_temporada = st.sidebar.selectbox("Seleccione la temporada:", TEMPORADAS, index=0)
 
-selector_temporada = st.sidebar.multiselect("Seleccione la temporada:", TEMPORADAS)
+selector_temporada = st.sidebar.multiselect("Seleccione la temporada:", TEMPORADAS,default="2024-1")
 print(selector_temporada)
 #df_proyecto = pd.read_excel(BD, sheet_name=selector_temporada)
 
