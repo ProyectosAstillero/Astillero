@@ -82,10 +82,12 @@ df_oxigeno.rename(columns={CTD: 'Oxígeno(m3)'}, inplace=True)
 #    selector_radio = ['ADITAMENTO']
 #if radio =="CASCO + ADITAMENTOS":
 #    selector_radio = ['ADITAMENTO','CASCO']
-    
+
+
 df_ratio = pd.merge(df_peso, df_soldadura, on=['Proyecto','Categoría'], how='outer')
 df_ratio = pd.merge(df_ratio, df_alambre, on=['Proyecto','Categoría'], how='outer')
 df_ratio = pd.merge(df_ratio, df_oxigeno, on=['Proyecto','Categoría'], how='outer')
+df_ratio['Soldadura Total(kg)'] = (df_ratio['Soldadura(kg)']+df_ratio['Alambre tub(kg)']*1.67)
         
 # Verifica si hay proyectos seleccionados
 if selector_proyecto:
@@ -133,6 +135,8 @@ if selector_proyecto:
         with col1:
             st.dataframe(df_ratio_proyecto, use_container_width=False,column_config={
                         "Proyecto": None,
+                        "Soldadura(kg)": None,
+                        "Alambre tub(kg)": None,
                         PESO: st.column_config.NumberColumn(
                             "Peso(kg)",
                             format="%.2f kg",
