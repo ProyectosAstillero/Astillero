@@ -38,15 +38,10 @@ df_total = pd.concat(dataframes, ignore_index=True)
 
 # Cargar el libro de trabajo y las hojas disponibles
 TEMPORADAS = load_workbook(BD, read_only=True).sheetnames
-print(df_total)
-#selector_temporada = st.sidebar.selectbox("Seleccione la temporada:", TEMPORADAS, index=0)
 
 selector_temporada = st.sidebar.multiselect("Seleccione la temporada:", TEMPORADAS,default="2024-1")
-print(selector_temporada)
-#df_proyecto = pd.read_excel(BD, sheet_name=selector_temporada)
 
 df_proyecto = df_total[df_total['Temporada'].isin(selector_temporada)]
-print(df_proyecto)
 
 # Inicializamos las listas para almacenar los DataFrames de cada temporada
 df_UTI_list = []
@@ -100,10 +95,15 @@ df_ratio_acero = pd.merge(df_ratio_acero, df_oxigeno, on=['Proyecto','Categoría
 df_ratio_acero = pd.merge(df_ratio_acero, df_disco, on=['Proyecto','Categoría'], how='outer')
 df_ratio_acero.fillna(0, inplace=True)
 
-df_ratio_acero['SoldxAcero'] = (df_ratio_acero['Soldadura(kg)']+df_ratio_acero['Alambre tub(kg)']*0.6)/df_ratio_acero['Peso(Tn)']
+df_ratio_acero['Soldadura Total(kg)'] = (df_ratio_acero['Soldadura(kg)']+df_ratio_acero['Alambre tub(kg)']*1.67)
+
+
+df_ratio_acero['SoldxAcero'] = (df_ratio_acero['Soldadura Total(kg)'])/df_ratio_acero['Peso(Tn)']
 df_ratio_acero['OxigenoxAcero'] = df_ratio_acero['Oxigeno(m3)']/df_ratio_acero['Peso(Tn)']
 df_ratio_acero['DiscoxAcero'] = df_ratio_acero['Discos(pz)']/df_ratio_acero['Peso(Tn)']
 df_ratio_acero.fillna(0, inplace=True)
+
+
 ######################################################################################################
 
 df_1= df_UTI.groupby(['Proyecto','Categoría'])['MAT Estimado'].sum().reset_index()
@@ -113,7 +113,6 @@ df_2['MOD']= df_2['MOD']/1000
 df_ratio = pd.merge(df_1, df_2, on=['Proyecto','Categoría'], how='outer')
 
 selector_nave = st.sidebar.selectbox("Seleccione categoria:", df_proyecto['Nave'].drop_duplicates(),index=0)
-print(selector_nave)
 
 #Se aplica el filtro de tipo de NAVE
 df_proyecto = df_proyecto[df_proyecto['Nave'].isin([selector_nave])]
@@ -146,7 +145,9 @@ if selector_categoria:
 
 else:
     st.warning("No se seleccionaron categorías.Mostrando el proyecto total")
-    
+
+df_ratio_acero= df_ratio_acero.groupby(['Proyecto']).sum().reset_index()
+print(df_ratio_acero)
   
 df = df.drop(columns=['Categoría'])
 df = df.groupby("Proyecto", as_index=False).sum()
@@ -213,17 +214,17 @@ print(df_ratio_acero)
 scatter_plot2 = px.scatter(
     df_ratio_acero,
     x='Peso(Tn)',
-    y='Soldadura(kg)',
+    y='Soldadura Total(kg)',
     color='Proyecto',
     size_max=15,
-    hover_data={'Proyecto': True, 'Peso(Tn)': True, 'Soldadura(kg)': True},
-    labels={'Peso(Tn)': 'Acero instalado (Toneladas)', 'Soldadura(kg)': 'Soldadura empleada (Kg)'},
+    hover_data={'Proyecto': True, 'Peso(Tn)': True, 'Soldadura Total(kg)': True},
+    labels={'Peso(Tn)': 'Acero instalado (Toneladas)', 'Soldadura Total(kg)': 'Soldadura empleada (Kg)'},
     title='Relación entre Acero y Soldadura (Regresión Grado 2)'
 )
 
 # Calcular la regresión polinómica de grado 2
 A = df_ratio_acero['Peso(Tn)']
-B = df_ratio_acero['Soldadura(kg)']
+B = df_ratio_acero['Soldadura Total(kg)']
 coeffs2 = np.polyfit(A, B, deg=2)  # Ajuste polinómico de grado 2
 a, b, c = coeffs2  # Coeficientes del polinomio
 
@@ -258,7 +259,7 @@ scatter_plot2.add_annotation(
 # Configurar el diseño del gráfico
 scatter_plot2.update_layout(
     xaxis_title="Peso (Toneladas)",
-    yaxis_title="Soldadura (Kg)",
+    yaxis_title="Soldadura Total(kg)",
     width=800,
     height=600,
 )
@@ -270,7 +271,7 @@ st.plotly_chart(scatter_plot2, use_container_width=True)
 #########################################################################################
 # Lista de las combinaciones de variables para los scatter plots
 combos = [
-    ('Soldadura(kg)', 'Peso(Tn)', 'Acero y Soldadura'),
+    ('Soldadura Total(kg)', 'Peso(Tn)', 'Acero y Soldadura'),
     ('Oxigeno(m3)', 'Peso(Tn)', 'Acero y Oxígeno'),
     ('Discos(pz)', 'Peso(Tn)', 'Acero y Discos')
 ]
@@ -329,3 +330,4 @@ for y_column, x_column, title in combos:
 
     # Mostrar el gráfico en Streamlit
     st.plotly_chart(scatter_plot, use_container_width=True)
+
