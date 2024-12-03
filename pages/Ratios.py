@@ -69,9 +69,9 @@ df_UTI = pd.concat(df_UTI_list, ignore_index=True)
 df_REDI = pd.concat(df_REDI_list, ignore_index=True)
 
 ############################PESOS#########################################
-df_acero= df_REDI.groupby(['Proyecto','Categoría'])['Peso estimado(kg)'].sum().reset_index()
-df_acero["Peso estimado(kg)"] = df_acero["Peso estimado(kg)"]/1000
-df_acero.rename(columns={'Peso estimado(kg)': 'Peso(Tn)'}, inplace=True)
+df_acero= df_REDI.groupby(['Proyecto','Categoría'])['Peso(kg)'].sum().reset_index()
+df_acero["Peso(kg)"] = df_acero["Peso(kg)"]/1000
+df_acero.rename(columns={'Peso(kg)': 'Peso(Tn)'}, inplace=True)
 
 df_soldadura= df_REDI[df_REDI['Desc.Corta'].str.startswith('SOLDADURA', na=False)]
 df_soldadura= df_soldadura.groupby(['Proyecto','Categoría'])['Cantidad tomada'].sum().reset_index()
@@ -97,7 +97,6 @@ df_ratio_acero.fillna(0, inplace=True)
 
 df_ratio_acero['Soldadura Total(kg)'] = (df_ratio_acero['Soldadura(kg)']+df_ratio_acero['Alambre tub(kg)']*1.67)
 
-
 df_ratio_acero['SoldxAcero'] = (df_ratio_acero['Soldadura Total(kg)'])/df_ratio_acero['Peso(Tn)']
 df_ratio_acero['OxigenoxAcero'] = df_ratio_acero['Oxigeno(m3)']/df_ratio_acero['Peso(Tn)']
 df_ratio_acero['DiscoxAcero'] = df_ratio_acero['Discos(pz)']/df_ratio_acero['Peso(Tn)']
@@ -106,8 +105,8 @@ df_ratio_acero.fillna(0, inplace=True)
 
 ######################################################################################################
 
-df_1= df_UTI.groupby(['Proyecto','Categoría'])['MAT Estimado'].sum().reset_index()
-df_1['MAT Estimado']= df_1['MAT Estimado']/1000
+df_1= df_UTI.groupby(['Proyecto','Categoría'])['MAT Despachado'].sum().reset_index()
+df_1['MAT Despachado']= df_1['MAT Despachado']/1000
 df_2= df_UTI.groupby(['Proyecto','Categoría'])['MOD'].sum().reset_index()
 df_2['MOD']= df_2['MOD']/1000
 df_ratio = pd.merge(df_1, df_2, on=['Proyecto','Categoría'], how='outer')
@@ -151,23 +150,23 @@ print(df_ratio_acero)
   
 df = df.drop(columns=['Categoría'])
 df = df.groupby("Proyecto", as_index=False).sum()
-df = df.query("`MAT Estimado` > 0 and MOD > 0")
+df = df.query("`MAT Despachado` > 0 and MOD > 0")
 df_ratio_acero = df_ratio_acero.query("`Peso(Tn)` > 0")
 # Crear un scatter plot interactivo con Plotly Express
 scatter_plot = px.scatter(
         df,
         x='MOD',
-        y='MAT Estimado',
+        y='MAT Despachado',
         color='Proyecto',
         size_max=15,
-        hover_data={'Proyecto': True, 'MOD': True, 'MAT Estimado': True},
-        labels={'MOD': 'Costo Mano de Obra (Miles)', 'MAT Estimado': 'Costo Material (Miles)'},
+        hover_data={'Proyecto': True, 'MOD': True, 'MAT Despachado': True},
+        labels={'MOD': 'Costo Mano de Obra (Miles)', 'MAT Despachado': 'Costo Material (Miles)'},
         title='Relación entre MOD y Material'
     )
     
 # Calcular la regresión lineal
 x = df['MOD']
-y = df['MAT Estimado']
+y = df['MAT Despachado']
 coeffs = np.polyfit(x, y, deg=1)  # Ajuste lineal
 slope, intercept = coeffs[0], coeffs[1]
 reg_line = slope * x + intercept  # Línea de regresión
