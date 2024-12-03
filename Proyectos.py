@@ -152,9 +152,7 @@ if selector_proyecto:
         df_alambre = df_alambre[df_alambre['Proyecto'] == proyecto]   
         df_oxigeno = df_oxigeno[df_oxigeno['Proyecto'] == proyecto] 
         
-        colored_header(label=proyecto,
-        color_name="violet-70")
-        
+        st.subheader(proyecto, divider=True)
         # Filtrar datos del proyecto seleccionado
         df_general = df_UTI[df_UTI['Proyecto'] == proyecto]
         df1= df_general.groupby(['Proyecto'])['MOD'].sum().reset_index()
