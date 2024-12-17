@@ -45,6 +45,9 @@ df_proyecto = df_total[df_total['Temporada'].isin([selector_temporada])]
 # Selección de proyecto
 selector_proyecto = st.sidebar.selectbox("Seleccione proyecto:", df_proyecto['Proyecto'].drop_duplicates().sort_values(), index=0)
 
+# Reemplazar "/" en el nombre del proyecto para evitar problemas con rutas
+selector_proyecto = selector_proyecto.replace("/", "")
+
 # Ruta de la carpeta del proyecto
 carpeta_proyecto = os.path.join(selector_temporada, selector_proyecto)
 
@@ -82,7 +85,7 @@ if os.path.exists(carpeta_proyecto):
 
             # Mostrar la imagen actual
             img_actual = Image.open(imagenes[st.session_state[key_img_index]])
-            st.image(img_actual, caption=f"Imagen {st.session_state[key_img_index] + 1} de {len(imagenes)}", use_container_width=True)
+            st.image(img_actual, caption=f"Imagen {st.session_state[key_img_index] + 1} de {len(imagenes)}")
 
             # Navegación del carrusel
             col1, col2, col3, col4= st.columns([0.5,1,2,1])
