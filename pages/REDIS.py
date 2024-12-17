@@ -51,11 +51,13 @@ df_UTI = df_UTI[df_UTI['Nombre Acreedor'].isin([selector_proveedor])]
 
 df_REDI = df_REDI[df_REDI['Proyecto'].isin([selector_proyecto])]
 
-selector_actividad = st.sidebar.multiselect("Seleccione actividad:", df_UTI['Denom.Operación'].drop_duplicates().replace(0, pd.NA).dropna())
+selector_grafo = st.sidebar.multiselect("Seleccione:", df_UTI['Descripción Grafo'].drop_duplicates().replace(0, pd.NA).dropna())
 
-print(selector_actividad)
+df_UTI = df_UTI[df_UTI['Descripción Grafo'].isin(selector_grafo)]
 
+df_REDI = df_REDI[df_REDI['Grafo'].isin(df_UTI["Grafo"])]
 
+selector_actividad = df_REDI["Denom.Operación"].drop_duplicates()
 
 #SUMA DE ACERO
 df_acero= df_REDI.groupby(['Proyecto','Categoría'])['Peso(kg)'].sum().reset_index()
@@ -84,18 +86,15 @@ df_ratio_acero = pd.merge(df_ratio_acero, df_oxigeno, on=['Proyecto','Categoría
 df_ratio_acero = pd.merge(df_ratio_acero, df_disco, on=['Proyecto','Categoría'], how='outer')
 df_ratio_acero.fillna(0, inplace=True)
 
-
 #############################################################################################################################
-print(df_REDI)
-############################################################################################################     
+    
 # Verifica si hay proyectos seleccionados
 if selector_proveedor:
  for actividad in selector_actividad:
     df_REDI_filtrado = df_REDI[df_REDI['Denom.Operación'].isin([actividad])]
     st.subheader(actividad, divider=True)
     # Filtrar datos del proyecto seleccionado
-    print(df_REDI_filtrado)
-    #st.subheader("Acero")
+    #print(df_REDI_filtrado)
 
     st.dataframe(df_REDI_filtrado,use_container_width=False,column_config={
                         "Tratar": None,
@@ -119,7 +118,6 @@ if selector_proveedor:
                         "Desc.Corta": st.column_config.Column(width='large')
 
                     },hide_index=True)
-    
                 
 else:
     st.info("Por favor, seleccione uno o más proyectos para ver los detalles.")
