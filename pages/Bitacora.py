@@ -82,7 +82,7 @@ if os.path.exists(carpeta_proyecto):
 
             # Mostrar la imagen actual
             img_actual = Image.open(imagenes[st.session_state[key_img_index]])
-            st.image(img_actual, caption=f"Imagen {st.session_state.img_index + 1} de {len(imagenes)}", use_container_width=True)
+            st.image(img_actual, caption=f"Imagen {st.session_state[key_img_index] + 1} de {len(imagenes)}", use_container_width=True)
 
             # Navegación del carrusel
             col1, col2, col3, col4= st.columns([0.5,1,2,1])
