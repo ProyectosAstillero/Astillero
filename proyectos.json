@@ -1,0 +1,16 @@
+{
+    "Proyectos": [
+        {
+            "Nombre": "EP TASA 17 ARBOLADURA",
+            "Fechas": ["11-Dic", "18-Dic"],
+            "AvanceProgramado": [0.0, 100],
+            "AvanceReal": [0.0, 90]
+        },
+        {
+            "Nombre": "Proyecto 2",
+            "Fechas": ["31-May", "4-Jun", "11-Jun", "18-Jun", "25-Jun", "2-Jul", "9-Jul", "16-Jul"],
+            "AvanceProgramado": [0.0, 1.5, 7.0, 15.0, 25.0, 30.0, 36.0, 40.0],
+            "AvanceReal": [0.0, 2.0, 10.0, 20.0, 35.0, 38.0, 42.0, 45.0]
+        }
+    ]
+}
