@@ -117,7 +117,7 @@ with col1:
             df,
             x="Fechas",
             y=["Avance Programado", "Avance Real"],
-            title=f"Avance del proyecto",
+            title=f"Curvas de Avance - {selector_proyecto_formateado}",
             labels={"value": "Porcentaje", "variable": "Tipo de Avance"},
             markers=True
         )
@@ -133,7 +133,7 @@ with col1:
         # Mostrar el gráfico
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.write("")
+        st.write("Datos insuficientes para generar el gráfico.")
 
 with col2:
     with st.container(height=600):
