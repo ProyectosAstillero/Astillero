@@ -6,6 +6,7 @@ import altair as alt
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
+from streamlit_echarts import st_echarts
 # Fecha actual
 FECHA = datetime.now().strftime('%d-%m-%y')
 
@@ -68,265 +69,127 @@ for temporada in selector_temporada:
 df_UTI = pd.concat(df_UTI_list, ignore_index=True)
 df_REDI = pd.concat(df_REDI_list, ignore_index=True)
 
-############################PESOS#########################################
-df_acero= df_REDI.groupby(['Proyecto','Categoría'])['Peso(kg)'].sum().reset_index()
-df_acero["Peso(kg)"] = df_acero["Peso(kg)"]/1000
-df_acero.rename(columns={'Peso(kg)': 'Peso(Tn)'}, inplace=True)
+##################################################################################
+#RATIOS GENERALES
+df_acero_G= df_REDI.groupby(['Categoría'])['Peso(kg)'].sum().reset_index()
+df_acero_G["Peso(kg)"] = df_acero_G["Peso(kg)"]/1000
+df_acero_G.rename(columns={'Peso(kg)': 'Peso(Tn)'}, inplace=True)
 
-df_soldadura= df_REDI[df_REDI['Desc.Corta'].str.startswith('SOLDADURA', na=False)]
-df_soldadura= df_soldadura.groupby(['Proyecto','Categoría'])['Cantidad tomada'].sum().reset_index()
-df_soldadura.rename(columns={'Cantidad tomada': 'Soldadura(kg)'}, inplace=True)
+df_soldadura_G= df_REDI[df_REDI['Desc.Corta'].str.startswith('SOLDADURA', na=False)]
+df_soldadura_G= df_soldadura_G.groupby(['Categoría'])['Cantidad tomada'].sum().reset_index()
+df_soldadura_G.rename(columns={'Cantidad tomada': 'Soldadura(kg)'}, inplace=True)
 
-df_alambre= df_REDI[df_REDI['Desc.Corta'].str.startswith('ALAMBRE', na=False)]
-df_alambre= df_alambre.groupby(['Proyecto','Categoría'])['Cantidad tomada'].sum().reset_index()
-df_alambre.rename(columns={'Cantidad tomada': 'Alambre tub(kg)'}, inplace=True)
+df_alambre_G= df_REDI[df_REDI['Desc.Corta'].str.startswith('ALAMBRE', na=False)]
+df_alambre_G= df_alambre_G.groupby(['Categoría'])['Cantidad tomada'].sum().reset_index()
+df_alambre_G.rename(columns={'Cantidad tomada': 'Alambre tub(kg)'}, inplace=True)
 
-df_oxigeno= df_REDI[df_REDI['Desc.Corta'].isin(['OXIGENO IND.'])]
-df_oxigeno= df_oxigeno.groupby(['Proyecto','Categoría'])['Cantidad tomada'].sum().reset_index()
-df_oxigeno.rename(columns={'Cantidad tomada': 'Oxigeno(m3)'}, inplace=True)
+df_oxigeno_G= df_REDI[df_REDI['Desc.Corta'].isin(['OXIGENO IND.'])]
+df_oxigeno_G= df_oxigeno_G.groupby(['Categoría'])['Cantidad tomada'].sum().reset_index()
+df_oxigeno_G.rename(columns={'Cantidad tomada': 'Oxigeno(m3)'}, inplace=True)
 
-df_disco= df_REDI[df_REDI['Desc.Corta'].str.startswith('DISCO', na=False)]
-df_disco= df_disco.groupby(['Proyecto','Categoría'])['Cantidad tomada'].sum().reset_index()
-df_disco.rename(columns={'Cantidad tomada': 'Discos(pz)'}, inplace=True)
+df_disco_G= df_REDI[df_REDI['Desc.Corta'].str.startswith('DISCO', na=False)]
+df_disco_G= df_disco_G.groupby(['Categoría'])['Cantidad tomada'].sum().reset_index()
+df_disco_G.rename(columns={'Cantidad tomada': 'Discos(pz)'}, inplace=True)
 
-df_ratio_acero = pd.merge(df_acero, df_soldadura, on=['Proyecto','Categoría'], how='outer')
-df_ratio_acero = pd.merge(df_ratio_acero, df_alambre, on=['Proyecto','Categoría'], how='outer')
-df_ratio_acero = pd.merge(df_ratio_acero, df_oxigeno, on=['Proyecto','Categoría'], how='outer')
-df_ratio_acero = pd.merge(df_ratio_acero, df_disco, on=['Proyecto','Categoría'], how='outer')
-df_ratio_acero.fillna(0, inplace=True)
+df_ratio = pd.merge(df_acero_G, df_soldadura_G, on=['Categoría'], how='outer')
+df_ratio = pd.merge(df_ratio, df_alambre_G, on=['Categoría'], how='outer')
+df_ratio = pd.merge(df_ratio, df_oxigeno_G, on=['Categoría'], how='outer')
+df_ratio = pd.merge(df_ratio, df_disco_G, on=['Categoría'], how='outer')
+df_ratio.fillna(0, inplace=True)
 
-df_ratio_acero['Soldadura Total(kg)'] = (df_ratio_acero['Soldadura(kg)']+df_ratio_acero['Alambre tub(kg)']*1.67)
+df_ratio['Soldadura Total(kg)'] = (df_ratio['Soldadura(kg)']+df_ratio['Alambre tub(kg)']*1.67)
 
-df_ratio_acero['SoldxAcero'] = (df_ratio_acero['Soldadura Total(kg)'])/df_ratio_acero['Peso(Tn)']
-df_ratio_acero['OxigenoxAcero'] = df_ratio_acero['Oxigeno(m3)']/df_ratio_acero['Peso(Tn)']
-df_ratio_acero['DiscoxAcero'] = df_ratio_acero['Discos(pz)']/df_ratio_acero['Peso(Tn)']
-df_ratio_acero.fillna(0, inplace=True)
+df_ratio['SoldxAcero'] = (df_ratio['Soldadura Total(kg)'])/df_ratio['Peso(Tn)']
+df_ratio['OxigenoxAcero'] = df_ratio['Oxigeno(m3)']/df_ratio['Peso(Tn)']
+df_ratio['DiscoxAcero'] = df_ratio['Discos(pz)']/df_ratio['Peso(Tn)']
+df_ratio.fillna(0, inplace=True)
+
+#Se elimina la categoría de : "PG" , "SISTEMAS AUXILIARES"
+df_ratio = df_ratio[df_ratio['Categoría'].isin(['CASCO','ADITAMENTO','PANGA'])]
+
+selector_categoria = st.sidebar.selectbox("Seleccione categoria:", ['CASCO','ADITAMENTO','PANGA'])
+
+#Se filtra la categoría
+df_ratio_filtrado = df_ratio[df_ratio['Categoría'].isin([selector_categoria])]
+#df_ratio_filtrado = df_ratio_filtrado.query("`Peso(Tn)` > 0")
+
+# Seleccionar columnas específicas
+columnas_seleccionadas = ["Categoría", "SoldxAcero", "OxigenoxAcero","DiscoxAcero"]
+df_seleccionado = df_ratio_filtrado[columnas_seleccionadas]
+df_seleccionado.fillna(0, inplace=True)
+print("df_ratio")
+print(df_REDI)
+
+# Configuración de la aplicación
+st.title("📉 Ratios: "+ selector_categoria)
+
+# Opciones configurables
+def generate_gauge_options(column_name, value,tooltip):
+    return {
+        "tooltip": {
+            "formatter": f"{tooltip}",
+        },
+        "series": [
+            {
+                "name": column_name,
+                "type": "gauge",
+                "progress": {"show": True, "width": 10},
+                "axisLine": {
+                    "lineStyle": {
+                        "width": 10,
+ 
+                    }
+                },
+                "pointer": {"width": 5},
+                "title": {
+                    "show": True,
+                    "offsetCenter": [0, "70%"],
+                    "fontSize": 20,
+                    "text": column_name,
+                },
+                "detail": {
+                    "valueAnimation": True,
+                    "formatter": "{value}",
+                    "fontSize": 30,
+                },
+                "data": [{"value": value, "name": column_name}],
+            }
+        ],
+    }
 
 
-######################################################################################################
+col1, col2, col3 = st.columns(3)
 
-df_1= df_UTI.groupby(['Proyecto','Categoría'])['MAT Despachado'].sum().reset_index()
-df_1['MAT Despachado']= df_1['MAT Despachado']/1000
-df_2= df_UTI.groupby(['Proyecto','Categoría'])['MOD'].sum().reset_index()
-df_2['MOD']= df_2['MOD']/1000
-df_ratio = pd.merge(df_1, df_2, on=['Proyecto','Categoría'], how='outer')
+with col1:
+    with st.container(border=True):
+        options = generate_gauge_options("SoldxAcero", int(df_seleccionado["SoldxAcero"].mean()),"Soldadura(kg) x Acero(Tn)")
+        st_echarts(options, width="400px") 
 
-selector_nave = st.sidebar.selectbox("Seleccione categoria:", df_proyecto['Nave'].drop_duplicates(),index=0)
+with col2:
+    with st.container(border=True):
+        options = generate_gauge_options("OxigenoxAcero", int(df_seleccionado["OxigenoxAcero"].mean()),"Oxígeno(m3) x Acero(Tn)")
+        st_echarts(options, width="400px")
 
-#Se aplica el filtro de tipo de NAVE
-df_proyecto = df_proyecto[df_proyecto['Nave'].isin([selector_nave])]
-
-
-df = df_ratio[df_ratio['Proyecto'].isin(df_proyecto['Proyecto'])] #Se filtra en el df general según las naves selecionadas
-df_ratio_acero = df_ratio_acero[df_ratio_acero['Proyecto'].isin(df_proyecto['Proyecto'])]
-
-LIST=[]
-if selector_nave:
-    if selector_nave=="Panga":
-        LIST=["PANGA"]
-    else:
-        LIST= ['CASCO','ADITAMENTO']
+with col3:
+    with st.container(border=True):
+        options = generate_gauge_options("DiscoxAcero", int(df_seleccionado["DiscoxAcero"].mean()),"Discos(pz) x Acero(Tn)")
+        st_echarts(options, width="400px")
         
+print(df_ratio)
 
-#SE FILTRA SEGÚN SEA CASCO O ADITAMENTOS
-selector_categoria = st.sidebar.multiselect("Seleccione categoria:", LIST)
-if selector_categoria:
-    if selector_categoria==["CASCO"]:
-        df = df[df['Categoría'].isin(["CASCO"])]
-        df_ratio_acero = df_ratio_acero[df_ratio_acero['Categoría'].isin(["CASCO"])]
-        
-    elif selector_categoria==['ADITAMENTO']:
-        df = df[~df['Categoría'].isin(["CASCO","SISTEMAS AUXILIARES","PROPULSION Y GOBIERNO"])]
-        df_ratio_acero = df_ratio_acero[~df_ratio_acero['Categoría'].isin(["CASCO","SISTEMAS AUXILIARES","PROPULSION Y GOBIERNO"])]
-    else:
-        df = df[~df['Categoría'].isin(["SISTEMAS AUXILIARES","PROPULSION Y GOBIERNO"])]
-        df_ratio_acero = df_ratio_acero[~df_ratio_acero['Categoría'].isin(["SISTEMAS AUXILIARES","PROPULSION Y GOBIERNO"])]
-
-else:
-    st.warning("No se seleccionaron categorías.Mostrando el proyecto total")
-
-df_ratio_acero= df_ratio_acero.groupby(['Proyecto']).sum().reset_index()
-print(df_ratio_acero)
-  
-df = df.drop(columns=['Categoría'])
-df = df.groupby("Proyecto", as_index=False).sum()
-df = df.query("`MAT Despachado` > 0 and MOD > 0")
-df_ratio_acero = df_ratio_acero.query("`Peso(Tn)` > 0")
-# Crear un scatter plot interactivo con Plotly Express
-scatter_plot = px.scatter(
-        df,
-        x='MOD',
-        y='MAT Despachado',
-        color='Proyecto',
-        size_max=15,
-        hover_data={'Proyecto': True, 'MOD': True, 'MAT Despachado': True},
-        labels={'MOD': 'Costo Mano de Obra (Miles)', 'MAT Despachado': 'Costo Material (Miles)'},
-        title='Relación entre MOD y Material'
-    )
-    
-# Calcular la regresión lineal
-x = df['MOD']
-y = df['MAT Despachado']
-coeffs = np.polyfit(x, y, deg=1)  # Ajuste lineal
-slope, intercept = coeffs[0], coeffs[1]
-reg_line = slope * x + intercept  # Línea de regresión
-
-# Añadir la línea de regresión al gráfico
-scatter_plot.add_trace(
-        go.Scatter(
-            x=x,
-            y=reg_line,
-            mode='lines',
-            name='Línea de Regresión',
-            line=dict(color='red', dash='dash'),
-        )
-    )
-
-# Agregar la ecuación de la regresión como anotación
-equation_text = f"f(x)  = {slope:.2f}x + {intercept:.2f}"
-scatter_plot.add_annotation(
-        x=max(x),  # Posición en el eje X
-        y=max(reg_line),  # Posición en el eje Y
-        text=equation_text,
-        showarrow=False,
-        font=dict(size=12, color="black"),
-        align="right",
-        bgcolor="rgba(255, 255, 255, 0.7)",
-        bordercolor="black",
-    )
-
-# Configurar el diseño del gráfico
-scatter_plot.update_layout(
-        xaxis_title="Costo Mano de Obra (Miles)",
-        yaxis_title="Costo Material (Miles)",
-        width=800,
-        height=600,
-    )
-
-# Mostrar el gráfico en Streamlit
-st.plotly_chart(scatter_plot, use_container_width=True)
-
-print(df_ratio_acero)
-
-################# Crear un scatter RATIO X ACERO
-# Scatter plot con línea de regresión de grado 2
-scatter_plot2 = px.scatter(
-    df_ratio_acero,
-    x='Peso(Tn)',
-    y='Soldadura Total(kg)',
-    color='Proyecto',
-    size_max=15,
-    hover_data={'Proyecto': True, 'Peso(Tn)': True, 'Soldadura Total(kg)': True},
-    labels={'Peso(Tn)': 'Acero instalado (Toneladas)', 'Soldadura Total(kg)': 'Soldadura empleada (Kg)'},
-    title='Relación entre Acero y Soldadura (Regresión Grado 2)'
-)
-
-# Calcular la regresión polinómica de grado 2
-A = df_ratio_acero['Peso(Tn)']
-B = df_ratio_acero['Soldadura Total(kg)']
-coeffs2 = np.polyfit(A, B, deg=2)  # Ajuste polinómico de grado 2
-a, b, c = coeffs2  # Coeficientes del polinomio
-
-# Generar valores de la curva
-A_sorted = np.sort(A)  # Ordenar X para que la curva sea continua
-reg_line2 = a * A_sorted**2 + b * A_sorted + c  # Generar Y usando la ecuación de segundo grado
-
-# Añadir la línea de regresión al gráfico
-scatter_plot2.add_trace(
-    go.Scatter(
-        x=A_sorted,
-        y=reg_line2,
-        mode='lines',
-        name='Línea de Regresión (Grado 2)',
-        line=dict(color='red', dash='dash'),
-    )
-)
-
-# Agregar la ecuación como anotación
-equation_text2 = f"f(x)  = {a:.2f}x² + {b:.2f}x + {c:.2f}"
-scatter_plot2.add_annotation(
-    x=A.mean(),  # Posición centrada en el promedio de X
-    y=(a * A.mean()**2 + b * A.mean() + c),  # Valor en el promedio de X
-    text=equation_text2,
-    showarrow=False,
-    font=dict(size=12, color="black"),
-    align="center",
-    bgcolor="rgba(255, 255, 255, 0.7)",
-    bordercolor="black",
-)
-
-# Configurar el diseño del gráfico
-scatter_plot2.update_layout(
-    xaxis_title="Peso (Toneladas)",
-    yaxis_title="Soldadura Total(kg)",
-    width=800,
-    height=600,
-)
-
-# Mostrar el gráfico en Streamlit
-st.plotly_chart(scatter_plot2, use_container_width=True)
-
-
-#########################################################################################
-# Lista de las combinaciones de variables para los scatter plots
-combos = [
-    ('Soldadura Total(kg)', 'Peso(Tn)', 'Acero y Soldadura'),
-    ('Oxigeno(m3)', 'Peso(Tn)', 'Acero y Oxígeno'),
-    ('Discos(pz)', 'Peso(Tn)', 'Acero y Discos')
-]
-
-# Bucle para generar los scatter plots
-for y_column, x_column, title in combos:
-    scatter_plot = px.scatter(
-        df_ratio_acero,
-        x=x_column,
-        y=y_column,
-        color='Proyecto',
-        size_max=15,
-        hover_data={'Proyecto': True, x_column: True, y_column: True},
-        labels={x_column: f'{x_column} ', y_column: f'{y_column}'},
-        title=f'Relación entre {title}'
-    )
-    
-    # Calcular la regresión lineal para cada combinación
-    A = df_ratio_acero[x_column]
-    B = df_ratio_acero[y_column]
-    coeffs = np.polyfit(A, B, deg=1)  # Ajuste lineal
-    slope, intercept = coeffs[0], coeffs[1]
-    reg_line = slope * A + intercept  # Línea de regresión
-
-    # Añadir la línea de regresión al gráfico
-    scatter_plot.add_trace(
-        go.Scatter(
-            x=A,
-            y=reg_line,
-            mode='lines',
-            name='Línea de Regresión',
-            line=dict(color='red', dash='dash'),
-        )
-    )
-
-    # Agregar la ecuación de la regresión como anotación
-    equation_text = f"f(x) = {slope:.2f}x + {intercept:.2f}"
-    scatter_plot.add_annotation(
-        x=A.mean(),  # Posición centrada en el promedio de X
-        y=(slope * A.mean() + intercept),  # Valor en el promedio de X
-        text=equation_text,
-        showarrow=False,
-        font=dict(size=12, color="black"),
-        align="center",
-        bgcolor="rgba(255, 255, 255, 0.7)",
-        bordercolor="black",
-    )
-
-    # Configurar el diseño del gráfico
-    scatter_plot.update_layout(
-        xaxis_title=f'{x_column}',
-        yaxis_title=f'{y_column}',
-        width=800,
-        height=600,
-    )
-
-    # Mostrar el gráfico en Streamlit
-    st.plotly_chart(scatter_plot, use_container_width=True)
-
+col1,col2,col3,col4,col5= st.columns(5)
+with col1:
+    with st.container(border=True):
+        st.metric(label="Peso(Tn)", value=f"{int(df_ratio_filtrado['Peso(Tn)'].mean())} Tn")
+with col2:       
+    with st.container(border=True):
+        st.metric(label="Soldadura(kg)", value=f"{int(df_ratio_filtrado['Soldadura(kg)'].mean())} kg")
+with col3:      
+    with st.container(border=True):
+        st.metric(label="Alambre tub(kg)", value=f"{int(df_ratio_filtrado['Alambre tub(kg)'].mean())} kg")
+with col4:      
+    with st.container(border=True):
+        st.metric(label="Oxigeno(m3)", value=f"{int(df_ratio_filtrado['Oxigeno(m3)'].mean())} m3")
+with col5:      
+    with st.container(border=True):
+        st.metric(label="Discos(pz)", value=f"{int(df_ratio_filtrado['Discos(pz)'].mean())} pz")
