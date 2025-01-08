@@ -6,6 +6,7 @@ import altair as alt
 import numpy as np
 from streamlit_extras.colored_header import colored_header
 import matplotlib.pyplot as plt
+from streamlit_echarts import st_echarts 
 # Fecha actual
 FECHA = datetime.now().strftime('%d-%m-%y')
 
@@ -145,8 +146,56 @@ with col2:
 ############################################################################################################     
 # Verifica si hay proyectos seleccionados
 if selector_proyecto:
- for proyecto in selector_proyecto:
+    # Filtrar los datos para los proyectos seleccionados
+    df_general = df_UTI[df_UTI['Proyecto'].isin(selector_proyecto)]
+    df_grouped = df_general.groupby(['Proyecto', 'Categoría']).agg({'MOD': 'sum', MAT: 'sum'}).reset_index()
+    df_grouped['Total'] = (df_grouped['MOD'] + df_grouped[MAT]).round(2)
+    
+    # Crear listas dinámicas para las categorías y proyectos
+    projects = df_grouped["Proyecto"].unique().tolist()  # Proyectos en el eje Y
+    categories = df_grouped["Categoría"].unique().tolist()  # Categorías como series
 
+    # Crear las series dinámicamente
+    series = []
+    for col in categories:
+        # Obtener los valores para cada categoría en todos los proyectos
+        category_data = df_grouped[df_grouped['Categoría'] == col]
+        data = []
+        for project in projects:
+            total_value = category_data[category_data['Proyecto'] == project]['Total'].sum()
+            data.append(total_value)
+        
+        # Añadir la serie con los datos por categoría
+        series.append({
+            "name": col,
+            "type": "bar",
+            "stack": "total",
+            "label": {
+                "show": True,
+                "formatter": "S/. {c}",  # Formato para las etiquetas
+            },
+            "emphasis": {"focus": "series"},
+            "data": data,
+        })
+
+    # Configurar las opciones del gráfico
+    options = {
+        "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
+        "legend": {"data": categories},  # Nombres de las categorías como leyenda
+        "grid": {"left": "3%", "right": "4%", "bottom": "3%", "containLabel": True},
+        "xAxis": {"type": "value"},
+        "yAxis": {"type": "category", "data": projects},  # Proyectos en el eje Y
+        "series": series,
+    }
+
+    # Mostrar el gráfico en Streamlit
+    with st.container(border=True):
+        st.subheader("Proyectos")
+        st_echarts(options=options, height="500px")
+    
+if selector_proyecto:
+ for proyecto in selector_proyecto:
+    with st.container(border=True):    
         df_peso = df_peso[df_peso['Proyecto'] == proyecto]
         df_soldadura = df_soldadura[df_soldadura['Proyecto'] == proyecto]
         df_alambre = df_alambre[df_alambre['Proyecto'] == proyecto]   
@@ -181,8 +230,8 @@ if selector_proyecto:
         
 
         df_ratio_proyecto = df_ratio[df_ratio['Proyecto'] == proyecto]
-        print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
-        print(df_ratio_proyecto)
+
+
         st.subheader("Acero")
         col1, col2 =st.columns([0.7,0.3])
         with col1:
@@ -217,4 +266,6 @@ if selector_proyecto:
 else:
     st.info("Por favor, seleccione uno o más proyectos para ver los detalles.")
     
+
+
 
