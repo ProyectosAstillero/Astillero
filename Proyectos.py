@@ -94,13 +94,13 @@ df_ratio['DiscoxAcero'] = df_ratio['Discos(pz)']/df_ratio['Peso(Tn)']
 df_ratio.fillna(0, inplace=True)
 
 #############################################################################################################################
-df_ratio = df_ratio[df_ratio['Categoría'].isin(['CASCO', 'ADITAMENTO', 'PANGA'])]
+df_ratio_GRAFICO = df_ratio[df_ratio['Categoría'].isin(['CASCO', 'ADITAMENTO', 'PANGA','PROYECTO MEJORA'])]  #SE FILTRA PARA CUADROS INICIALES DE RATIOS
 print(df_ratio)
 col1, col2 =st.columns([0.5,0.5])
 with col1:
     with st.container(border=True):
         st.subheader("Peso(Tn)")
-        chart_ACERO = alt.Chart(df_ratio[df_ratio['Proyecto'].isin(selector_proyecto)]).mark_bar().encode(
+        chart_ACERO = alt.Chart(df_ratio_GRAFICO[df_ratio_GRAFICO['Proyecto'].isin(selector_proyecto)]).mark_bar().encode(
             x=alt.X('Proyecto:N', title='', axis=alt.Axis(labelAngle=-35)),  # Título del eje X oculto
             y=alt.Y("Peso(Tn):Q", title='Peso(Tn)', axis=None),  # El dominio comienza en 0
             color=alt.Color('Categoría:N', scale=alt.Scale(domain=['ADITAMENTO', 'CASCO', 'PANGA'], range=['#2e86c1','#5dade2','#d6eaf8']), legend=alt.Legend(title='Categoría',orient='bottom')),
@@ -111,7 +111,7 @@ with col1:
 with col2:
     with st.container(border=True):
         st.subheader("Soldadura(Kg) vs Peso(Tn)")
-        chart_Sold = alt.Chart(df_ratio[df_ratio['Proyecto'].isin(selector_proyecto)]).mark_bar().encode(
+        chart_Sold = alt.Chart(df_ratio_GRAFICO[df_ratio_GRAFICO['Proyecto'].isin(selector_proyecto)]).mark_bar().encode(
             x=alt.X('Proyecto:N', title='', axis=alt.Axis(labelAngle=-35)),  # Título del eje X oculto
             y=alt.Y("SoldxAcero:Q", title='SoldxAcero Kg/Tn', axis=None),  # El dominio comienza en 0
             color=alt.Color('Categoría:N', scale=alt.Scale(domain=['ADITAMENTO', 'CASCO', 'PANGA'], range=['#FFC300','#FF5733','#C70039']), legend=alt.Legend(title='Categoría',orient='bottom')),
@@ -124,7 +124,7 @@ col1, col2 =st.columns([0.5,0.5])
 with col1:
     with st.container(border=True):
         st.subheader("Oxígeno(m3) vs Peso(Tn)")
-        chart_oxigeno = alt.Chart(df_ratio[df_ratio['Proyecto'].isin(selector_proyecto)]).mark_bar().encode(
+        chart_oxigeno = alt.Chart(df_ratio_GRAFICO[df_ratio_GRAFICO['Proyecto'].isin(selector_proyecto)]).mark_bar().encode(
             x=alt.X('Proyecto:N', title='', axis=alt.Axis(labelAngle=-35)),  # Título del eje X oculto
             y=alt.Y("OxigenoxAcero:Q", title='OxigenoxAcero m3/Tn', axis=None),  # El dominio comienza en 0
             color=alt.Color('Categoría:N', scale=alt.Scale(domain=['ADITAMENTO', 'CASCO', 'PANGA'], range=['#82e0aa ','#abebc6 ','#d5f5e3']), legend=alt.Legend(title='Categoría',orient='bottom')),
@@ -135,7 +135,7 @@ with col1:
 with col2:
     with st.container(border=True):
         st.subheader("Discos(pz) vs Peso(Tn)")
-        chart_Sold = alt.Chart(df_ratio[df_ratio['Proyecto'].isin(selector_proyecto)]).mark_bar().encode(
+        chart_Sold = alt.Chart(df_ratio_GRAFICO[df_ratio_GRAFICO['Proyecto'].isin(selector_proyecto)]).mark_bar().encode(
             x=alt.X('Proyecto:N', title='', axis=alt.Axis(labelAngle=-35)),  # Título del eje X oculto
             y=alt.Y("DiscoxAcero:Q", title='Discos pz/Tn', axis=None),  # El dominio comienza en 0
             color=alt.Color('Categoría:N', scale=alt.Scale(domain=['ADITAMENTO', 'CASCO', 'PANGA'], range=['#85929e','#d6dbdf','#aeb6bf']), legend=alt.Legend(title='Categoría',orient='bottom')),

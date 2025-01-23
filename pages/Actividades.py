@@ -3,7 +3,7 @@ import pandas as pd
 import requests
 import numpy as np
 import altair as alt
-from streamlit_lottie import st_lottie
+#from streamlit_lottie import st_lottie
 from datetime import datetime, timedelta
 import os
 from openpyxl import load_workbook

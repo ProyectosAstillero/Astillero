@@ -40,7 +40,7 @@ df_total = pd.concat(dataframes, ignore_index=True)
 # Cargar el libro de trabajo y las hojas disponibles
 TEMPORADAS = load_workbook(BD, read_only=True).sheetnames
 
-selector_temporada = st.sidebar.multiselect("Seleccione la temporada:", TEMPORADAS,default="2024-1")
+selector_temporada = st.sidebar.multiselect("Seleccione la temporada:", TEMPORADAS,default="2025-1")
 
 df_proyecto = df_total[df_total['Temporada'].isin(selector_temporada)]
 
@@ -180,19 +180,19 @@ print(df_ratio)
 col1,col2,col3,col4,col5= st.columns(5)
 with col1:
     with st.container(border=True):
-        st.metric(label="Peso(Tn)", value=f"{int(df_ratio_filtrado['Peso(Tn)'].mean())} Tn")
+        st.metric(label="Peso(Tn)", value=f"{int(df_ratio_filtrado['Peso(Tn)'].sum())} Tn")
 with col2:       
     with st.container(border=True):
-        st.metric(label="Soldadura(kg)", value=f"{int(df_ratio_filtrado['Soldadura(kg)'].mean())} kg")
+        st.metric(label="Soldadura(kg)", value=f"{int(df_ratio_filtrado['Soldadura(kg)'].sum())} kg")
 with col3:      
     with st.container(border=True):
-        st.metric(label="Alambre tub(kg)", value=f"{int(df_ratio_filtrado['Alambre tub(kg)'].mean())} kg")
+        st.metric(label="Alambre tub(kg)", value=f"{int(df_ratio_filtrado['Alambre tub(kg)'].sum())} kg")
 with col4:      
     with st.container(border=True):
-        st.metric(label="Oxigeno(m3)", value=f"{int(df_ratio_filtrado['Oxigeno(m3)'].mean())} m3")
+        st.metric(label="Oxigeno(m3)", value=f"{int(df_ratio_filtrado['Oxigeno(m3)'].sum())} m3")
 with col5:      
     with st.container(border=True):
-        st.metric(label="Discos(pz)", value=f"{int(df_ratio_filtrado['Discos(pz)'].mean())} pz")
+        st.metric(label="Discos(pz)", value=f"{int(df_ratio_filtrado['Discos(pz)'].sum())} pz")
         
         
 
@@ -204,27 +204,68 @@ REDI_filtrado =  df_REDI[df_REDI["Proyecto"].isin(df_proyecto["Proyecto"])]
 # Agrupar por 'Material' y sumar 'Cantidad'
 consolidados =  df_REDI.groupby(["Material",'Desc.Corta'], as_index=False).agg({'Cantidad': 'sum',"MAT Estimado": 'sum'})
 
+#MAQUINARIA EN PROYECTOS
+PD_MAQUINARIA = df_UTI[df_UTI['Liquidación'] > 0]
+
+PD_GRUA= PD_MAQUINARIA[PD_MAQUINARIA['Denom.Operación'].str.contains('grua|grúa', case=False, na=False)]
+PD_GRUA= PD_GRUA.groupby(['Proyecto'])['MOD'].sum().reset_index()
+PD_GRUA.rename(columns={'MOD': 'GRUA'}, inplace=True)
+
+PD_MONTACARGA= PD_MAQUINARIA[PD_MAQUINARIA['Denom.Operación'].str.contains('montacarga', case=False, na=False)]
+PD_MONTACARGA= PD_MONTACARGA.groupby(['Proyecto'])['MOD'].sum().reset_index()
+PD_MONTACARGA.rename(columns={'MOD': 'MONTACARGA'}, inplace=True)
+
+df_maquinaria = pd.merge(PD_MONTACARGA, PD_GRUA, on='Proyecto', how='outer')
+df_maquinaria.fillna(0, inplace=True)  
+
+#LIMPIEZA CARRIL
+
+PD_CARRIL = df_UTI[df_UTI['Liquidación'] > 0]
+
+PD_CARRIL= PD_CARRIL[PD_CARRIL['Denom.Operación'].str.contains('limpieza de carril', case=False, na=False)]
+PD_CARRIL= PD_CARRIL.groupby(['Proyecto'])['MOD'].sum().reset_index()
+PD_CARRIL.rename(columns={'MOD': 'Limpieza de carril'}, inplace=True)
+    
+#ESFUERZO ADICIONAL
+BD_ESFUERZO =  df_UTI[df_UTI['Liquidación'] > 0]
+BD_ESFUERZO = BD_ESFUERZO[BD_ESFUERZO['Denom.Operación'].str.contains('esfuerzo', case=False, na=False)]
+BD_ESFUERZO = BD_ESFUERZO.groupby(['Proyecto'])['MOD'].sum().reset_index()
+BD_ESFUERZO.rename(columns={'MOD': 'Esfuerzo Adicional'}, inplace=True)
 
 
-print(REDI_filtrado)
+st.subheader("Consolidado de la temporada")
+col1,col2,col3,col4= st.columns(4)
+with col1:
+    with st.container(border=True):
+        st.metric(label="Grúa", value=f"S/ {df_maquinaria['GRUA'].sum():,.2f}")
+with col2:       
+    with st.container(border=True):
+        st.metric(label="Montacarga", value=f"S/ {df_maquinaria['MONTACARGA'].sum():,.2f}")
+with col3:      
+    with st.container(border=True):
+        st.metric(label="Limpieza de carril", value=f"S/ {PD_CARRIL['Limpieza de carril'].sum():,.2f}")
+with col4:      
+    with st.container(border=True):
+        st.metric(label="Esfuerzo Adicional", value=f"S/ {BD_ESFUERZO['Esfuerzo Adicional'].sum():,.2f}")
 
 
 
+#TABLA DE MATERIALES EMPLEADOS EN LA TEMPORADA
 df_ratio = df_ratio[df_ratio['Categoría'].isin(['CASCO','ADITAMENTO','PANGA'])]
 
-st.subheader("Materiales totales usados por temporada")
-material = st.text_input("Ingrese busqueda")
+with st.expander("Materiales totales usados por temporada"):
+    material = st.text_input("Ingrese busqueda")
 
-# Filtrar los datos según la entrada del usuario
-if material.strip():  # Verificar que el usuario ha ingresado texto
-    filtrado = consolidados[consolidados['Desc.Corta'].str.contains(material, case=False, na=False)]
-else:
-    filtrado = consolidados
-    
-st.dataframe(filtrado,use_container_width=True, hide_index=True,column_config={
-                        'MAT Estimado': st.column_config.NumberColumn(
-                            "MAT Estimado",
-                            format="S/ %.2f",  
-                        )
-                    })
-
+    # Filtrar los datos según la entrada del usuario
+    if material.strip():  # Verificar que el usuario ha ingresado texto
+        filtrado = consolidados[consolidados['Desc.Corta'].str.contains(material, case=False, na=False)]
+    else:
+        filtrado = consolidados
+        filtrado['Material'] = filtrado['Material'].astype(str)
+        
+    st.dataframe(filtrado,use_container_width=True, hide_index=True,column_config={
+                            'MAT Estimado': st.column_config.NumberColumn(
+                                "MAT Estimado",
+                                format="S/ %.2f",  
+                            )
+                        })
