@@ -248,7 +248,11 @@ with col4:
     with st.container(border=True):
         st.metric(label="Esfuerzo Adicional", value=f"S/ {BD_ESFUERZO['Esfuerzo Adicional'].sum():,.2f}")
 
+# GRAFICO RESUMEN 
+with st.expander("Detalles x Proyecto"):
+    st.bar_chart(PD_CARRIL, x = "Proyecto",x_label="Limpieza de patio")
 
+    st.bar_chart(df_maquinaria.set_index('Proyecto'),x_label="Maquinaria")
 
 #TABLA DE MATERIALES EMPLEADOS EN LA TEMPORADA
 df_ratio = df_ratio[df_ratio['Categoría'].isin(['CASCO','ADITAMENTO','PANGA'])]
