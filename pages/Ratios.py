@@ -195,8 +195,6 @@ with col5:
         st.metric(label="Discos(pz)", value=f"{int(df_ratio_filtrado['Discos(pz)'].sum())} pz")
         
         
-
-
 df_consolidado = df_REDI
 
 REDI_filtrado =  df_REDI[df_REDI["Proyecto"].isin(df_proyecto["Proyecto"])]
