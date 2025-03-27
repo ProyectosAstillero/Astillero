@@ -127,7 +127,7 @@ with col1:
         chart_oxigeno = alt.Chart(df_ratio_GRAFICO[df_ratio_GRAFICO['Proyecto'].isin(selector_proyecto)]).mark_bar().encode(
             x=alt.X('Proyecto:N', title='', axis=alt.Axis(labelAngle=-35)),  # Título del eje X oculto
             y=alt.Y("OxigenoxAcero:Q", title='OxigenoxAcero m3/Tn', axis=None),  # El dominio comienza en 0
-            color=alt.Color('Categoría:N', scale=alt.Scale(domain=['ADITAMENTO', 'CASCO', 'PANGA','PROYECTO MEJORA','OPEX','BE CASCO', range=['#82e0aa ','#abebc6','#d5f5e3','#82e0aa ','#abebc6','#d5f5e3']), legend=alt.Legend(title='Categoría',orient='bottom')),
+            color=alt.Color('Categoría:N', scale=alt.Scale(domain=['ADITAMENTO', 'CASCO', 'PANGA','PROYECTO MEJORA','OPEX','BE CASCO'], range=['#82e0aa ','#abebc6','#d5f5e3','#82e0aa ','#abebc6','#d5f5e3']), legend=alt.Legend(title='Categoría',orient='bottom')),
             tooltip=['Proyecto', 'Categoría', 'OxigenoxAcero']
         ).properties(width=300, height=350)
 
