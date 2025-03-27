@@ -103,7 +103,7 @@ with col1:
         chart_ACERO = alt.Chart(df_ratio_GRAFICO[df_ratio_GRAFICO['Proyecto'].isin(selector_proyecto)]).mark_bar().encode(
             x=alt.X('Proyecto:N', title='', axis=alt.Axis(labelAngle=-35)),  # Título del eje X oculto
             y=alt.Y("Peso(Tn):Q", title='Peso(Tn)', axis=None),  # El dominio comienza en 0
-            color=alt.Color('Categoría:N', scale=alt.Scale(domain=['ADITAMENTO', 'CASCO', 'PANGA'], range=['#2e86c1','#5dade2','#d6eaf8']), legend=alt.Legend(title='Categoría',orient='bottom')),
+            color=alt.Color('Categoría:N', scale=alt.Scale(domain=['ADITAMENTO', 'CASCO', 'PANGA','PROYECTO MEJORA','OPEX','BE CASCO'], range=['#2e86c1','#5dade2','#d6eaf8']), legend=alt.Legend(title='Categoría',orient='bottom')),
             tooltip=['Proyecto', 'Categoría', 'Peso(Tn)']
         ).properties(width=300, height=350)
 
@@ -114,7 +114,7 @@ with col2:
         chart_Sold = alt.Chart(df_ratio_GRAFICO[df_ratio_GRAFICO['Proyecto'].isin(selector_proyecto)]).mark_bar().encode(
             x=alt.X('Proyecto:N', title='', axis=alt.Axis(labelAngle=-35)),  # Título del eje X oculto
             y=alt.Y("SoldxAcero:Q", title='SoldxAcero Kg/Tn', axis=None),  # El dominio comienza en 0
-            color=alt.Color('Categoría:N', scale=alt.Scale(domain=['ADITAMENTO', 'CASCO', 'PANGA'], range=['#FFC300','#FF5733','#C70039']), legend=alt.Legend(title='Categoría',orient='bottom')),
+            color=alt.Color('Categoría:N', scale=alt.Scale(domain=['ADITAMENTO', 'CASCO', 'PANGA','PROYECTO MEJORA','OPEX','BE CASCO'], range=['#FFC300','#FF5733','#C70039']), legend=alt.Legend(title='Categoría',orient='bottom')),
            tooltip=['Proyecto', 'Categoría', 'SoldxAcero']
         ).properties(width=300, height=350)
 
@@ -127,7 +127,7 @@ with col1:
         chart_oxigeno = alt.Chart(df_ratio_GRAFICO[df_ratio_GRAFICO['Proyecto'].isin(selector_proyecto)]).mark_bar().encode(
             x=alt.X('Proyecto:N', title='', axis=alt.Axis(labelAngle=-35)),  # Título del eje X oculto
             y=alt.Y("OxigenoxAcero:Q", title='OxigenoxAcero m3/Tn', axis=None),  # El dominio comienza en 0
-            color=alt.Color('Categoría:N', scale=alt.Scale(domain=['ADITAMENTO', 'CASCO', 'PANGA'], range=['#82e0aa ','#abebc6 ','#d5f5e3']), legend=alt.Legend(title='Categoría',orient='bottom')),
+            color=alt.Color('Categoría:N', scale=alt.Scale(domain=['ADITAMENTO', 'CASCO', 'PANGA','PROYECTO MEJORA','OPEX','BE CASCO', range=['#82e0aa ','#abebc6 ','#d5f5e3']), legend=alt.Legend(title='Categoría',orient='bottom')),
             tooltip=['Proyecto', 'Categoría', 'OxigenoxAcero']
         ).properties(width=300, height=350)
 
@@ -138,7 +138,7 @@ with col2:
         chart_Sold = alt.Chart(df_ratio_GRAFICO[df_ratio_GRAFICO['Proyecto'].isin(selector_proyecto)]).mark_bar().encode(
             x=alt.X('Proyecto:N', title='', axis=alt.Axis(labelAngle=-35)),  # Título del eje X oculto
             y=alt.Y("DiscoxAcero:Q", title='Discos pz/Tn', axis=None),  # El dominio comienza en 0
-            color=alt.Color('Categoría:N', scale=alt.Scale(domain=['ADITAMENTO', 'CASCO', 'PANGA'], range=['#85929e','#d6dbdf','#aeb6bf']), legend=alt.Legend(title='Categoría',orient='bottom')),
+            color=alt.Color('Categoría:N', scale=alt.Scale(domain=['ADITAMENTO', 'CASCO', 'PANGA','PROYECTO MEJORA','OPEX','BE CASCO'], range=['#85929e','#d6dbdf','#aeb6bf']), legend=alt.Legend(title='Categoría',orient='bottom')),
            tooltip=['Proyecto', 'Categoría', 'DiscoxAcero']
         ).properties(width=300, height=350)
 
