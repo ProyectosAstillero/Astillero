@@ -94,7 +94,7 @@ df_ratio['DiscoxAcero'] = df_ratio['Discos(pz)']/df_ratio['Peso(Tn)']
 df_ratio.fillna(0, inplace=True)
 
 #############################################################################################################################
-df_ratio_GRAFICO = df_ratio[df_ratio['Categoría'].isin(['CASCO', 'ADITAMENTO', 'PANGA','PROYECTO MEJORA'])]  #SE FILTRA PARA CUADROS INICIALES DE RATIOS
+df_ratio_GRAFICO = df_ratio[df_ratio['Categoría'].isin(['CASCO', 'ADITAMENTO', 'PANGA','PROYECTO MEJORA','OPEX','BE CASCO'])]   #SE FILTRA PARA CUADROS INICIALES DE RATIOS
 print(df_ratio)
 col1, col2 =st.columns([0.5,0.5])
 with col1:
