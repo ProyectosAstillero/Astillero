@@ -105,9 +105,10 @@ df_ratio['DiscoxAcero'] = df_ratio['Discos(pz)']/df_ratio['Peso(Tn)']
 df_ratio.fillna(0, inplace=True)
 
 #Se elimina la categoría de : "PG" , "SISTEMAS AUXILIARES"
-df_ratio = df_ratio[df_ratio['Categoría'].isin(['CASCO','ADITAMENTO','PANGA'])]
+df_ratio = df_ratio[df_ratio['Categoría'].isin(['CASCO','ADITAMENTO','PANGA','VELA I CARENA','VELA I MODULO'
+])]
 
-selector_categoria = st.sidebar.selectbox("Seleccione categoria:", ['CASCO','ADITAMENTO','PANGA'])
+selector_categoria = st.sidebar.selectbox("Seleccione categoria:", ['CASCO','ADITAMENTO','PANGA','VELA I CARENA','VELA I MODULO'])
 
 #Se filtra la categoría
 df_ratio_filtrado = df_ratio[df_ratio['Categoría'].isin([selector_categoria])]
