@@ -221,7 +221,7 @@ df_maquinaria.fillna(0, inplace=True)
 
 PD_CARRIL = df_UTI[df_UTI['Liquidación'] > 0]
 
-PD_CARRIL= PD_CARRIL[PD_CARRIL['Denom.Operación'].str.contains('limpieza|limp de carril|patio', case=False, na=False)]
+PD_CARRIL= PD_CARRIL[PD_CARRIL['Denom.Operación'].str.contains('limpieza de carril|patio', case=False, na=False)]
 PD_CARRIL= PD_CARRIL.groupby(['Proyecto'])['MOD'].sum().reset_index()
 PD_CARRIL.rename(columns={'MOD': 'Limpieza de carril'}, inplace=True)
     
@@ -272,3 +272,4 @@ with st.expander("Materiales totales usados por temporada"):
                                 format="S/ %.2f",  
                             )
                         })
+
