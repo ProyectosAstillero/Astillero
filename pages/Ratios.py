@@ -249,9 +249,14 @@ with col4:
 
 # GRAFICO RESUMEN 
 with st.expander("Detalles x Proyecto"):
-    st.bar_chart(PD_CARRIL, x = "Proyecto",x_label="Limpieza de patio")
+    st.subheader("Limpieza de patio")
+    st.bar_chart(PD_CARRIL, x="Proyecto")
 
-    st.bar_chart(df_maquinaria.set_index('Proyecto'),x_label="Maquinaria")
+    st.subheader("Maquinaria")
+    st.bar_chart(df_maquinaria.set_index('Proyecto'))
+    
+    st.subheader("Esfuerzo Adicional")
+    st.bar_chart(BD_ESFUERZO.set_index('Proyecto'))
 
 #TABLA DE MATERIALES EMPLEADOS EN LA TEMPORADA
 df_ratio = df_ratio[df_ratio['Categoría'].isin(['CASCO','ADITAMENTO','PANGA'])]
@@ -272,4 +277,5 @@ with st.expander("Materiales totales usados por temporada"):
                                 format="S/ %.2f",  
                             )
                         })
+
 
