@@ -48,9 +48,9 @@ select_proyecto = st.sidebar.selectbox('Seleciona un proyecto',df_UTI['Proyecto'
 
 PD_BD = df_UTI[df_UTI['Proyecto'].isin([select_proyecto])]
 
-select_sistema = st.sidebar.selectbox('Seleciona un sistema',PD_BD['Categoría'].dropna().drop_duplicates().sort_values(), key='select_sistema')
+select_sistema = st.sidebar.multiselect('Seleciona un sistema',PD_BD['Categoría'].dropna().drop_duplicates().sort_values(), key='select_sistema')
 
-PD_BD = PD_BD[PD_BD['Categoría'].isin([select_sistema])]
+PD_BD = PD_BD[PD_BD['Categoría'].isin(select_sistema)]
 
 #Ocultar para consolidado de pesos
 #select_actividad = st.sidebar.selectbox('Seleciona una actividad',PD_MAT['Descripción Grafo'].dropna().drop_duplicates().sort_values(), key='actividad')
@@ -60,7 +60,7 @@ PD_BD = PD_BD[PD_BD['Categoría'].isin([select_sistema])]
 
 PD_MAT = df_REDI.drop(columns=['Tratar','Ind.REDI','Nro.REDI'])
 PD_MAT = PD_MAT[PD_MAT['Proyecto'].isin([select_proyecto])]
-PD_MAT = PD_MAT[PD_MAT['Categoría'].isin([select_sistema])]
+PD_MAT = PD_MAT[PD_MAT['Categoría'].isin(select_sistema)]
 
 st.title (select_proyecto)
 
