@@ -55,7 +55,8 @@ selector_grafo = st.sidebar.multiselect("Seleccione:", df_UTI['Descripción Graf
 
 df_UTI = df_UTI[df_UTI['Descripción Grafo'].isin(selector_grafo)]
 
-df_REDI = df_REDI[df_REDI['Grafo'].isin(df_UTI["Grafo"])]
+keys = df_UTI.set_index(['Grafo', 'Oper.']).index  #Filtrar por Grafo y Operación
+df_REDI = df_REDI[df_REDI.set_index(['Grafo', 'Oper.']).index.isin(keys)].reset_index(drop=True)
 
 selector_actividad = df_REDI["Denom.Operación"].drop_duplicates()
 
