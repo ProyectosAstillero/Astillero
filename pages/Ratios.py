@@ -224,6 +224,7 @@ PD_CARRIL = df_UTI[df_UTI['Liquidación'] > 0]
 PD_CARRIL= PD_CARRIL[PD_CARRIL['Denom.Operación'].str.contains('limpieza de carril|patio', case=False, na=False)]
 PD_CARRIL= PD_CARRIL.groupby(['Proyecto'])['MOD'].sum().reset_index()
 PD_CARRIL.rename(columns={'MOD': 'Limpieza de carril'}, inplace=True)
+
     
 #ESFUERZO ADICIONAL
 BD_ESFUERZO =  df_UTI[df_UTI['Liquidación'] > 0]
@@ -231,7 +232,7 @@ BD_ESFUERZO = BD_ESFUERZO[BD_ESFUERZO['Denom.Operación'].str.contains('esfuerzo
 BD_ESFUERZO = BD_ESFUERZO.groupby(['Proyecto'])['MOD'].sum().reset_index()
 BD_ESFUERZO.rename(columns={'MOD': 'Esfuerzo Adicional'}, inplace=True)
 
-
+st.divider() 
 st.subheader("Consolidado de la temporada")
 col1,col2,col3,col4= st.columns(4)
 with col1:
@@ -247,6 +248,7 @@ with col4:
     with st.container(border=True):
         st.metric(label="Esfuerzo Adicional", value=f"S/ {BD_ESFUERZO['Esfuerzo Adicional'].sum():,.2f}")
 
+# GRAFICO RESUMEN 
 # GRAFICO RESUMEN 
 with st.expander("Detalles x Proyecto"):
     st.subheader("Limpieza de patio")
@@ -277,5 +279,3 @@ with st.expander("Materiales totales usados por temporada"):
                                 format="S/ %.2f",  
                             )
                         })
-
-
