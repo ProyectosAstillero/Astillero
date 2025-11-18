@@ -94,7 +94,26 @@ df_ratio['DiscoxAcero'] = df_ratio['Discos(pz)']/df_ratio['Peso(Tn)']
 df_ratio.fillna(0, inplace=True)
 
 #############################################################################################################################
-df_ratio_GRAFICO = df_ratio[df_ratio['Categoría'].isin(['CASCO', 'ADITAMENTO', 'PANGA','PROYECTO MEJORA','OPEX','BE CASCO','VELA I CARENA','VELA I MODULO','SAMA I CARENA','SAMA I MODULO'])]   #SE FILTRA PARA CUADROS INICIALES DE RATIOS
+if selector_temporada == "Modulo":
+    df_ratio_GRAFICO = df_ratio[df_ratio['Categoría'].isin(['VELA I CARENA','VELA I MODULO','SAMA I CARENA','SAMA I MODULO'])]
+    color_domain_acero = ['VELA I CARENA','VELA I MODULO','SAMA I CARENA','SAMA I MODULO']
+    color_range_acero = ['#2e86c1','#5dade2','#d6eaf8','#2e86c1']
+    color_domain_sold = ['VELA I CARENA','VELA I MODULO','SAMA I CARENA','SAMA I MODULO']
+    color_range_sold = ['#FFC300','#FF5733','#C70039','#FFC300']
+    color_domain_oxi = ['VELA I CARENA','VELA I MODULO','SAMA I CARENA','SAMA I MODULO']
+    color_range_oxi = ['#82e0aa ','#abebc6','#d5f5e3','#82e0aa ']
+    color_domain_disc = ['VELA I CARENA','VELA I MODULO','SAMA I CARENA','SAMA I MODULO']
+    color_range_disc = ['#85929e','#d6dbdf','#aeb6bf','#85929e']
+else:
+    df_ratio_GRAFICO = df_ratio[df_ratio['Categoría'].isin(['CASCO', 'ADITAMENTO', 'PANGA','PROYECTO MEJORA','OPEX','BE CASCO'])]   #SE FILTRA PARA CUADROS INICIALES DE RATIOS
+    color_domain_acero = ['ADITAMENTO', 'CASCO', 'PANGA','PROYECTO MEJORA','OPEX','BE CASCO',]
+    color_range_acero = ['#2e86c1','#5dade2','#d6eaf8','#2e86c1','#d6eaf8','#5dade2']
+    color_domain_sold = ['ADITAMENTO', 'CASCO', 'PANGA','PROYECTO MEJORA','OPEX','BE CASCO',]
+    color_range_sold = ['#FFC300','#FF5733','#C70039','#FFC300','#C70039','#FF5733']
+    color_domain_oxi = ['ADITAMENTO', 'CASCO', 'PANGA','PROYECTO MEJORA','OPEX','BE CASCO']
+    color_range_oxi = ['#82e0aa ','#abebc6','#d5f5e3','#82e0aa ','#d5f5e3','#abebc6']
+    color_domain_disc = ['ADITAMENTO', 'CASCO', 'PANGA','PROYECTO MEJORA','OPEX','BE CASCO']
+    color_range_disc = ['#85929e','#d6dbdf','#aeb6bf','#85929e','#aeb6bf','#d6dbdf']
 print(df_ratio)
 col1, col2 =st.columns([0.5,0.5])
 with col1:
@@ -103,7 +122,7 @@ with col1:
         chart_ACERO = alt.Chart(df_ratio_GRAFICO[df_ratio_GRAFICO['Proyecto'].isin(selector_proyecto)]).mark_bar().encode(
             x=alt.X('Proyecto:N', title='', axis=alt.Axis(labelAngle=-35)),  # Título del eje X oculto
             y=alt.Y("Peso(Tn):Q", title='Peso(Tn)', axis=None),  # El dominio comienza en 0
-            color=alt.Color('Categoría:N', scale=alt.Scale(domain=['ADITAMENTO', 'CASCO', 'PANGA','PROYECTO MEJORA','OPEX','BE CASCO','VELA I CARENA','VELA I MODULO','SAMA I CARENA','SAMA I MODULO'], range=['#2e86c1','#5dade2','#d6eaf8','#2e86c1','#d6eaf8','#5dade2','#2e86c1','#5dade2','#d6eaf8','#2e86c1']), legend=alt.Legend(title='Categoría',orient='bottom')),
+            color=alt.Color('Categoría:N', scale=alt.Scale(domain=color_domain_acero, range=color_range_acero), legend=alt.Legend(title='Categoría',orient='bottom')),
             tooltip=['Proyecto', 'Categoría', 'Peso(Tn)']
         ).properties(width=300, height=350)
 
@@ -114,7 +133,7 @@ with col2:
         chart_Sold = alt.Chart(df_ratio_GRAFICO[df_ratio_GRAFICO['Proyecto'].isin(selector_proyecto)]).mark_bar().encode(
             x=alt.X('Proyecto:N', title='', axis=alt.Axis(labelAngle=-35)),  # Título del eje X oculto
             y=alt.Y("SoldxAcero:Q", title='SoldxAcero Kg/Tn', axis=None),  # El dominio comienza en 0
-            color=alt.Color('Categoría:N', scale=alt.Scale(domain=['ADITAMENTO', 'CASCO', 'PANGA','PROYECTO MEJORA','OPEX','BE CASCO','VELA I CARENA','VELA I MODULO','SAMA I CARENA','SAMA I MODULO'], range=['#FFC300','#FF5733','#C70039','#FFC300','#C70039','#FF5733','#FFC300','#FF5733','#C70039','#FFC300']), legend=alt.Legend(title='Categoría',orient='bottom')),
+            color=alt.Color('Categoría:N', scale=alt.Scale(domain=color_domain_sold, range=color_range_sold), legend=alt.Legend(title='Categoría',orient='bottom')),
            tooltip=['Proyecto', 'Categoría', 'SoldxAcero']
         ).properties(width=300, height=350)
 
@@ -127,7 +146,7 @@ with col1:
         chart_oxigeno = alt.Chart(df_ratio_GRAFICO[df_ratio_GRAFICO['Proyecto'].isin(selector_proyecto)]).mark_bar().encode(
             x=alt.X('Proyecto:N', title='', axis=alt.Axis(labelAngle=-35)),  # Título del eje X oculto
             y=alt.Y("OxigenoxAcero:Q", title='OxigenoxAcero m3/Tn', axis=None),  # El dominio comienza en 0
-            color=alt.Color('Categoría:N', scale=alt.Scale(domain=['ADITAMENTO', 'CASCO', 'PANGA','PROYECTO MEJORA','OPEX','BE CASCO','VELA I CARENA','VELA I MODULO','SAMA I CARENA','SAMA I MODULO'], range=['#82e0aa ','#abebc6','#d5f5e3','#82e0aa ','#d5f5e3','#abebc6']), legend=alt.Legend(title='Categoría',orient='bottom')),
+            color=alt.Color('Categoría:N', scale=alt.Scale(domain=color_domain_oxi, range=color_range_oxi), legend=alt.Legend(title='Categoría',orient='bottom')),
             tooltip=['Proyecto', 'Categoría', 'OxigenoxAcero']
         ).properties(width=300, height=350)
 
@@ -138,7 +157,7 @@ with col2:
         chart_Sold = alt.Chart(df_ratio_GRAFICO[df_ratio_GRAFICO['Proyecto'].isin(selector_proyecto)]).mark_bar().encode(
             x=alt.X('Proyecto:N', title='', axis=alt.Axis(labelAngle=-35)),  # Título del eje X oculto
             y=alt.Y("DiscoxAcero:Q", title='Discos pz/Tn', axis=None),  # El dominio comienza en 0
-            color=alt.Color('Categoría:N', scale=alt.Scale(domain=['ADITAMENTO', 'CASCO', 'PANGA','PROYECTO MEJORA','OPEX','BE CASCO','VELA I CARENA','VELA I MODULO','SAMA I CARENA','SAMA I MODULO'], range=['#85929e','#d6dbdf','#aeb6bf','#85929e','#aeb6bf','#d6dbdf']), legend=alt.Legend(title='Categoría',orient='bottom')),
+            color=alt.Color('Categoría:N', scale=alt.Scale(domain=color_domain_disc, range=color_range_disc), legend=alt.Legend(title='Categoría',orient='bottom')),
            tooltip=['Proyecto', 'Categoría', 'DiscoxAcero']
         ).properties(width=300, height=350)
 
