@@ -114,7 +114,7 @@ else:
     color_range_oxi = ['#82e0aa ','#abebc6','#d5f5e3','#82e0aa ','#d5f5e3','#abebc6']
     color_domain_disc = ['ADITAMENTO', 'CASCO', 'PANGA','PROYECTO MEJORA','OPEX','BE CASCO']
     color_range_disc = ['#85929e','#d6dbdf','#aeb6bf','#85929e','#aeb6bf','#d6dbdf']
-print(df_ratio)
+#print(df_ratio)
 col1, col2 =st.columns([0.5,0.5])
 with col1:
     with st.container(border=True):
@@ -209,9 +209,64 @@ if selector_proyecto:
 
     # Mostrar el gráfico en Streamlit
     with st.container(border=True):
-        st.subheader("Proyectos")
-        st_echarts(options=options, height="500px")
+            st.subheader("Proyectos")
+            st_echarts(options=options, height="500px")
+############################################################################################################     
+# Verifica si hay proyectos seleccionados
+if selector_proyecto:
+    df_precioxpl = df_REDI[df_REDI['Proyecto'].isin(selector_proyecto)]
+    df_precioxpl = df_precioxpl[['Proyecto','Desc.Corta',CTD,MAT]]
+    df_filtrado = df_precioxpl[df_precioxpl['Desc.Corta'].isin(['PLANCHA AC.NAVAL 9.50X1.800X6000MM', 'PLANCHA AC.NAVAL 8.00X1.800X6000MM', 'PLANCHA AC.NAVAL 6.40X1.800X6000MM'])]
+    df_agrupado = df_filtrado.groupby(['Proyecto', 'Desc.Corta'], as_index=False).agg({
+        CTD: 'sum',
+        MAT: 'sum'
+    })
     
+    # Calcular precio unitario
+    df_agrupado['Precio Unitario'] = df_agrupado[MAT] / df_agrupado[CTD]
+    
+    # Preparar datos para el gráfico
+    proyectos = df_agrupado['Proyecto'].unique().tolist()
+    tipos_plancha = df_agrupado['Desc.Corta'].unique().tolist()
+    
+    # Crear series para cada tipo de plancha
+    series = []
+    for tipo in tipos_plancha:
+        datos = []
+        for proyecto in proyectos:
+            valor = df_agrupado[(df_agrupado['Proyecto'] == proyecto) & 
+                               (df_agrupado['Desc.Corta'] == tipo)]['Precio Unitario']
+            datos.append(round(valor.values[0], 2) if len(valor) > 0 else 0)
+        
+        # Nombre corto para la leyenda
+        nombre_corto = tipo.replace('PLANCHA AC.NAVAL ', 'PL-').replace('X1.800X6000MM', '')
+        
+        series.append({
+            "name": nombre_corto,
+            "type": "bar",
+            "data": datos,
+            "label": {"show": True, "position": "top", "formatter": "S/ {c}"}
+        })
+    
+    # Configurar opciones del gráfico
+    options_planchas = {
+        "title": {"text": "Precio Unitario por Tipo de Plancha"},
+        "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
+        "legend": {"data": [s["name"] for s in series]},
+        "grid": {"left": "3%", "right": "4%", "bottom": "3%", "containLabel": True},
+        "xAxis": {"type": "category", "data": proyectos},
+        "yAxis": {"type": "value", "name": "Precio Unitario (S/)"},
+        "series": series,
+    }
+    
+    # Mostrar el gráfico
+    with st.container(border=True):
+        #st.subheader("Precio Unitario por Tipo de Plancha")
+        st_echarts(options=options_planchas, height="400px")
+
+
+
+############################################################################################################   
 if selector_proyecto:
  for proyecto in selector_proyecto:
     with st.container(border=True):    
@@ -281,6 +336,7 @@ if selector_proyecto:
             
             # Mostrar el gráfico
             st.altair_chart(chart, use_container_width=True)
+
               
 else:
     st.info("Por favor, seleccione uno o más proyectos para ver los detalles.")
