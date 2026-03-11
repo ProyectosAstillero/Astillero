@@ -255,7 +255,11 @@ if selector_proyecto:
     options_planchas = {
         #"title": {"text": "Precio Unitario de Planchas"},
         "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
-        "legend": {"data": [s["name"] for s in series]},
+        "legend": {
+            "data": [s["name"] for s in series],
+            "top": "0%",  # Posición arriba
+            "orient": "horizontal"  # Orientación horizontal
+        },
         "grid": {"left": "3%", "right": "4%", "bottom": "3%", "containLabel": True},
         "xAxis": {"type": "category", "data": proyectos},
         "yAxis": {"type": "value", "name": "Precio Unitario (S/)"},
