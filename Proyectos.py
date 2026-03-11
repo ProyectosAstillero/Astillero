@@ -198,6 +198,7 @@ if selector_proyecto:
         })
 
     # Configurar las opciones del gráfico
+    
     options = {
         "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
         "legend": {"data": categories},  # Nombres de las categorías como leyenda
@@ -249,19 +250,22 @@ if selector_proyecto:
         })
     
     # Configurar opciones del gráfico
+    colores = ['#FFC107', '#4CAF50', '#2196F3']  # Amarillo, Verde, Azul
+    
     options_planchas = {
-        "title": {"text": "Precio Unitario por Tipo de Plancha"},
+        #"title": {"text": "Precio Unitario de Planchas"},
         "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
         "legend": {"data": [s["name"] for s in series]},
         "grid": {"left": "3%", "right": "4%", "bottom": "3%", "containLabel": True},
         "xAxis": {"type": "category", "data": proyectos},
         "yAxis": {"type": "value", "name": "Precio Unitario (S/)"},
+        "color": colores,
         "series": series,
     }
     
     # Mostrar el gráfico
     with st.container(border=True):
-        #st.subheader("Precio Unitario por Tipo de Plancha")
+        st.subheader("Precio Unitario de Plancha")
         st_echarts(options=options_planchas, height="400px")
 
 
