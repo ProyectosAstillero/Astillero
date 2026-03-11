@@ -201,7 +201,10 @@ if selector_proyecto:
     
     options = {
         "tooltip": {"trigger": "axis", "axisPointer": {"type": "shadow"}},
-        "legend": {"data": categories},  # Nombres de las categorías como leyenda
+        "legend": {
+            "data": categories,
+            "top": "0%",  # Posición arriba
+            "orient": "horizontal"},  # Orientación horizontal  # Nombres de las categorías como leyenda
         "grid": {"left": "3%", "right": "4%", "bottom": "3%", "containLabel": True},
         "xAxis": {"type": "value"},
         "yAxis": {"type": "category", "data": projects},  # Proyectos en el eje Y
